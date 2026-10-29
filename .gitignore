@@ -1,0 +1,9 @@
+node_modules/
+dist/
+data/
+inbox/
+.env
+.env.local
+*.log
+.DS_Store
+vite.config.mjs.timestamp-*

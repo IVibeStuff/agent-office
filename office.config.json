@@ -1,0 +1,14 @@
+{
+  "title": "Agent Office",
+  "leadId": "ada",
+  "staleWorkingMinutes": 10,
+  "quietWarningMinutes": 45,
+  "heartbeatMinutes": 5,
+  "usageRefreshMinutes": 5,
+  "team": [
+    { "id": "ada", "name": "Ada", "role": "Lead", "color": "#5b6cf0", "match": [] },
+    { "id": "ben", "name": "Ben", "role": "Builder", "color": "#f59e0b", "match": ["builder"] },
+    { "id": "cleo", "name": "Cleo", "role": "Reviewer", "color": "#14b8a6", "match": ["reviewer"] },
+    { "id": "dex", "name": "Dex", "role": "Researcher", "color": "#fb7185", "match": ["researcher"] }
+  ]
+}

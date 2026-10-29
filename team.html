@@ -1,0 +1,86 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="theme-color" content="#000000" />
+  <title>Team setup</title>
+  <style>
+    :root { --bg: #000; --card: #0d0e11; --line: #1f2228; --text: #e7e8ec; --muted: #8b8f99; --accent: #5b6cf0; --ok: #34d399; --warn: #fbbf24; --err: #f87171; }
+    * { box-sizing: border-box; }
+    html, body { margin: 0; background: var(--bg); color: var(--text); font: 14px/1.5 system-ui, -apple-system, Segoe UI, sans-serif; }
+    main { max-width: 860px; margin: 0 auto; padding: 22px 16px 60px; }
+    header { display: flex; align-items: center; gap: 12px; margin-bottom: 18px; flex-wrap: wrap; }
+    header h1 { font-size: 20px; margin: 0; flex: 1; }
+    a.btn, button { font: inherit; color: var(--text); background: #111318; border: 1px solid var(--line); border-radius: 10px; padding: 8px 14px; cursor: pointer; text-decoration: none; }
+    button.primary { background: var(--accent); border-color: var(--accent); color: #fff; font-weight: 600; }
+    button:disabled { opacity: .45; cursor: not-allowed; }
+    .card { background: var(--card); border: 1px solid var(--line); border-radius: 14px; padding: 18px; margin-bottom: 16px; }
+    .card h2 { font-size: 13px; letter-spacing: .06em; text-transform: uppercase; color: var(--muted); margin: 0 0 12px; font-weight: 600; display: flex; justify-content: space-between; }
+    .welcome { border-color: #2a3350; background: linear-gradient(180deg, #121733, #0d0e11); }
+    .welcome p { margin: 4px 0; color: #c9cde0; }
+    input[type=text] { width: 100%; font: inherit; color: var(--text); background: #08090b; border: 1px solid var(--line); border-radius: 9px; padding: 8px 10px; }
+    input[type=text]:focus { outline: none; border-color: #3a4566; }
+    .agent { display: grid; grid-template-columns: 34px 1.1fr 1fr auto auto; gap: 8px; align-items: center; padding: 8px 0; border-top: 1px solid #16181d; }
+    .agent:first-of-type { border-top: 0; }
+    .agent .sw { width: 30px; height: 30px; border-radius: 50%; border: 2px solid #ffffff22; cursor: pointer; padding: 0; position: relative; overflow: hidden; }
+    .agent .sw input { position: absolute; inset: 0; opacity: 0; cursor: pointer; }
+    .lead { display: flex; align-items: center; gap: 5px; color: var(--muted); font-size: 12px; white-space: nowrap; cursor: pointer; }
+    .lead input { accent-color: var(--accent); }
+    .x { padding: 6px 10px; color: var(--muted); }
+    .match { grid-column: 2 / -1; display: none; }
+    .adv .match { display: block; }
+    .match input { font-size: 12px; }
+    .row { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; margin-top: 12px; }
+    .muted { color: var(--muted); font-size: 12.5px; }
+    .msg { font-size: 13px; }
+    .msg.ok { color: var(--ok); } .msg.err { color: var(--err); }
+    .tabs { display: inline-flex; background: #111318; border: 1px solid var(--line); border-radius: 10px; padding: 3px; margin-bottom: 12px; flex-wrap: wrap; }
+    .tabs button { border: 0; background: none; color: var(--muted); padding: 6px 12px; border-radius: 7px; }
+    .tabs button.on { background: #1d2029; color: var(--text); }
+    pre { background: #08090b; border: 1px solid var(--line); border-radius: 10px; padding: 12px; overflow-x: auto; font: 12.5px/1.5 ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; color: #d6dae4; white-space: pre; margin: 8px 0; position: relative; }
+    .copy { position: absolute; top: 6px; right: 6px; padding: 3px 8px; font-size: 11px; }
+    .ids { display: flex; gap: 6px; flex-wrap: wrap; margin: 6px 0; }
+    .ids code { background: #15171c; border: 1px solid var(--line); border-radius: 6px; padding: 2px 7px; font-size: 12px; }
+    @media (max-width: 640px) { .agent { grid-template-columns: 34px 1fr auto; } .agent .role { grid-column: 2 / -1; } }
+  </style>
+</head>
+<body>
+  <main>
+    <header>
+      <a class="btn" href="/" id="back">← Office</a>
+      <h1>Team</h1>
+      <a class="btn" href="/agents.html">Wardrobe</a>
+    </header>
+    <section class="card welcome" id="welcome" hidden>
+      <h2>Welcome</h2>
+      <p>Set up your team: up to eight agents, each with a name, a role and a colour. One of them leads.</p>
+      <p>Then connect your AI (below), so each agent shows up in the office as it works.</p>
+    </section>
+    <section class="card">
+      <h2>Office name</h2>
+      <input type="text" id="title" maxlength="40" placeholder="Agent Office" />
+    </section>
+    <section class="card" id="team-card">
+      <h2><span>Agents <span id="count"></span></span><label class="lead"><input type="checkbox" id="adv" /> Advanced</label></h2>
+      <div id="agents"></div>
+      <div class="row">
+        <button id="add">+ Add agent</button>
+        <span class="muted" id="hint">Agents are ordered by place: the lead takes the lead's desk, the others follow in this order.</span>
+      </div>
+      <div class="row">
+        <button class="primary" id="save">Save team</button>
+        <span class="msg" id="msg"></span>
+      </div>
+    </section>
+    <section class="card" id="connect">
+      <h2>Connect your AI</h2>
+      <div class="muted" style="margin-bottom:8px">Each agent reports what it's doing with one of these. Agent IDs for this team:</div>
+      <div class="ids" id="ids"></div>
+      <div class="tabs" id="tabs"></div>
+      <div id="howto"></div>
+    </section>
+  </main>
+  <script type="module" src="/src/team.js"></script>
+</body>
+</html>

@@ -1,0 +1,37 @@
+{
+  "name": "agent-office",
+  "version": "1.0.0",
+  "description": "A live 3D office for your AI agents. Watch up to eight agents work in six themed rooms; connect any AI over MCP, HTTP or a shared folder.",
+  "license": "MIT",
+  "keywords": [
+    "ai-agents",
+    "mcp",
+    "claude",
+    "dashboard",
+    "three.js",
+    "virtual-office",
+    "agent-monitoring"
+  ],
+  "type": "module",
+  "private": true,
+  "engines": {
+    "node": ">=18.17"
+  },
+  "scripts": {
+    "dev": "vite",
+    "dev:lan": "vite --host",
+    "build": "vite build",
+    "start": "vite build && vite preview",
+    "status": "node scripts/status.mjs",
+    "hooks:install": "node scripts/install-hooks.mjs install",
+    "hooks:remove": "node scripts/install-hooks.mjs remove",
+    "hooks:show": "node scripts/install-hooks.mjs show",
+    "mcp": "node mcp/server.mjs"
+  },
+  "dependencies": {
+    "three": "0.169.0"
+  },
+  "devDependencies": {
+    "vite": "5.4.10"
+  }
+}
