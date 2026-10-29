@@ -21,5 +21,7 @@ export default defineConfig({
   server: { port: Number(env.OFFICE_PORT) || 5180, strictPort: true },
   preview: { port: Number(env.OFFICE_PORT) || 5180, strictPort: true },
   // the office, the Wardrobe and the Team page
+  // scan every page up front, so the very first visit isn't interrupted by a dependency reload
+  optimizeDeps: { entries: ['index.html', 'team.html', 'agents.html'] },
   build: { chunkSizeWarningLimit: 1500, rollupOptions: { input: { main: 'index.html', agents: 'agents.html', team: 'team.html' } } },
 });
