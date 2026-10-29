@@ -143,7 +143,7 @@ export function buildWorld({ team, leadId, desks }) {
     const t = new THREE.CanvasTexture(c); t.colorSpace = THREE.SRGBColorSpace;
     westDecor.push(B(root, 0.05, 1.0, 1.3, '#1a1e26', L.LEFT_WALL_X + 0.025, 1.35, 3.85, { cast: false }));
     const art = new THREE.Mesh(new THREE.PlaneGeometry(1.18, 0.88), new THREE.MeshStandardMaterial({ map: t, roughness: 1 }));
-    art.rotation.y = Math.PI / 2; art.position.set(L.LEFT_WALL_X + 0.06, 1.85, 3.85);
+    art.rotation.y = Math.PI / 2; art.position.set(L.LEFT_WALL_X + 0.07, 1.85, 3.85);
     root.add(art); westDecor.push(art);
   }
 
@@ -274,7 +274,7 @@ export function buildWorld({ team, leadId, desks }) {
     westDecor.push(B(root, 0.06, u.h + 0.1, u.w + 0.1, '#1a1f28', L.LEFT_WALL_X + 0.03, u.y - u.h / 2 - 0.05, u.z, { cast: false }));
     const m = new THREE.Mesh(new THREE.PlaneGeometry(u.w, u.h), new THREE.MeshBasicMaterial({ map: usageBoard.texture, toneMapped: false, color: '#d4d8df' }));
     m.rotation.y = Math.PI / 2;
-    m.position.set(L.LEFT_WALL_X + 0.065, u.y, u.z);
+    m.position.set(L.LEFT_WALL_X + 0.08, u.y, u.z); // 2 cm clear of the frame
     root.add(m); westDecor.push(m);
   }
   // bookshelf in research

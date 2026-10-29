@@ -125,7 +125,7 @@ export function mountUsage(root, board, { frame = '#11161d', edge = null, tint =
   const u = L.USAGE_BOARD;
   B(root, 0.08, u.h + 0.14, u.w + 0.14, frame, L.LEFT_WALL_X + 0.04, u.y - u.h / 2 - 0.07, u.z, { cast: false });
   const m = new THREE.Mesh(new THREE.PlaneGeometry(u.w, u.h), new THREE.MeshBasicMaterial({ map: board.texture, toneMapped: false, color: tint }));
-  m.rotation.y = Math.PI / 2; m.position.set(L.LEFT_WALL_X + 0.085, u.y, u.z); root.add(m);
+  m.rotation.y = Math.PI / 2; m.position.set(L.LEFT_WALL_X + 0.1, u.y, u.z); root.add(m); // 2 cm clear of the frame
   if (edge) B(root, 0.03, 0.025, u.w + 0.14, edge, L.LEFT_WALL_X + 0.09, u.y + u.h / 2 + 0.07, u.z, { cast: false });
 }
 

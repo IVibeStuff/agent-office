@@ -21,7 +21,7 @@ request or write a file, and comes with six themed rooms, each in two styles.
 You need [Node.js](https://nodejs.org) 18.17 or newer.
 
 ```bash
-git clone https://github.com/<you>/agent-office.git
+git clone https://github.com/IVibeStuff/agent-office.git
 cd agent-office
 npm install
 npm run dev

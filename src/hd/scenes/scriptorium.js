@@ -76,11 +76,12 @@ function build({ scene, renderer, slotColors = [] }) {
   function carrel(i, x, z, face) {
     const g = group(x, z, face);
     box(0.95, 0.04, 0.6, oak, 0, 0.72, 0.42, 0.01, g);                               // flat shelf
-    const slope = mesh(new THREE.BoxGeometry(0.85, 0.035, 0.5), oak, 0, 0.88, 0.3, g); slope.rotation.x = 0.42;
+    // the writing slope rises away from the scribe, so the page faces them
+    const slope = mesh(new THREE.BoxGeometry(0.85, 0.035, 0.5), oak, 0, 0.88, 0.3, g); slope.rotation.x = -0.42;
     for (const sx of [-0.42, 0.42]) box(0.05, 0.9, 0.55, darkOak, sx, 0, 0.42, 0.01, g);
     box(0.9, 0.5, 0.03, darkOak, 0, 0.9, 0.7, 0.01, g);                              // back board
     const mat = new THREE.MeshStandardMaterial({ map: parchment(7 + i, '#c9a032'), roughness: 0.9, emissive: '#ffcf70', emissiveMap: null, emissiveIntensity: 0 });
-    const page = new THREE.Mesh(new THREE.PlaneGeometry(0.34, 0.44), mat); page.position.set(0, 0.91, 0.31); page.rotation.x = -Math.PI / 2 + 0.42; g.add(page);
+    const page = new THREE.Mesh(new THREE.PlaneGeometry(0.34, 0.44), mat); page.position.set(0, 0.91, 0.29); page.rotation.x = -Math.PI / 2 - 0.42; g.add(page);
     mesh(new THREE.CylinderGeometry(0.03, 0.035, 0.05, 12), std('#1a1a1a', 0.4), 0.36, 0.74, 0.55, g);  // inkwell
     const q = mesh(new THREE.CylinderGeometry(0.004, 0.002, 0.24, 6), std('#e8e2d0', 0.8), 0.34, 0.86, 0.55, g); q.rotation.z = 0.5;
     const c = candle(g, -0.36, 0.74, 0.55);
@@ -97,9 +98,9 @@ function build({ scene, renderer, slotColors = [] }) {
     const g = group(x, z, face);
     box(0.5, 0.06, 0.5, darkOak, 0, 0, 0.55, 0.01, g);
     mesh(new THREE.CylinderGeometry(0.06, 0.09, 1.0, 12), darkOak, 0, 0.5, 0.55, g);
-    const top = mesh(new THREE.BoxGeometry(0.8, 0.05, 0.6), oak, 0, 1.12, 0.52, g); top.rotation.x = 0.5;
+    const top = mesh(new THREE.BoxGeometry(0.8, 0.05, 0.6), oak, 0, 1.12, 0.52, g); top.rotation.x = -0.5;
     const mat = new THREE.MeshStandardMaterial({ map: parchment(3, '#d9b040'), roughness: 0.9, emissive: '#ffcf70', emissiveIntensity: 0 });
-    for (const s of [-1, 1]) { const p = new THREE.Mesh(new THREE.PlaneGeometry(0.34, 0.46), mat); p.position.set(s * 0.18, 1.155, 0.51); p.rotation.set(-Math.PI / 2 + 0.5, 0, s * 0.05); g.add(p); }
+    for (const s of [-1, 1]) { const p = new THREE.Mesh(new THREE.PlaneGeometry(0.34, 0.46), mat); p.position.set(s * 0.18, 1.155, 0.5); p.rotation.set(-Math.PI / 2 - 0.5, 0, s * 0.05); g.add(p); }
     // a pair of tall iron candlesticks either side
     const cs = [];
     for (const s of [-1, 1]) {

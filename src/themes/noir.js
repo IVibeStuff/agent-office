@@ -206,7 +206,7 @@ export function buildNoir({ team, leadId, desks, title = 'Agent Office' }) {
   // ---------- evidence board, filing cabinets, usage chalkboard (west wall) ----------
   {
     const eb = new THREE.Mesh(new THREE.PlaneGeometry(3.6, 2.25), new THREE.MeshStandardMaterial({ map: evidenceBoard(), roughness: 1 }));
-    eb.rotation.y = Math.PI / 2; eb.position.set(L.LEFT_WALL_X + 0.06, 1.95, -4.1); root.add(eb); westDecor.push(eb);
+    eb.rotation.y = Math.PI / 2; eb.position.set(L.LEFT_WALL_X + 0.085, 1.95, -4.1); root.add(eb); westDecor.push(eb); // clear of its frame (no z-fighting)
     const ef = B(root, 0.06, 2.4, 3.75, COL.oakDark, L.LEFT_WALL_X + 0.03, 0.75, -4.1, { cast: false }); westDecor.push(ef);
   }
   const cabinet = (x, z, rot) => {
@@ -223,7 +223,7 @@ export function buildNoir({ team, leadId, desks, title = 'Agent Office' }) {
     const uz = 0.75, uw = 2.4, uh = 1.16, uy = 2.05;
     const fr = B(root, 0.08, uh + 0.14, uw + 0.14, COL.oak, L.LEFT_WALL_X + 0.04, uy - uh / 2 - 0.07, uz, { cast: false }); westDecor.push(fr);
     const m = new THREE.Mesh(new THREE.PlaneGeometry(uw, uh), new THREE.MeshBasicMaterial({ map: usageBoard.texture, toneMapped: false, color: '#dcd8c8' }));
-    m.rotation.y = Math.PI / 2; m.position.set(L.LEFT_WALL_X + 0.085, uy, uz); root.add(m); westDecor.push(m);
+    m.rotation.y = Math.PI / 2; m.position.set(L.LEFT_WALL_X + 0.1, uy, uz); root.add(m); westDecor.push(m);
   }
 
   // ---------- chief's office: wainscot + frosted glass, title on the door ----------

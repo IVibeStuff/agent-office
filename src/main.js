@@ -13,6 +13,7 @@ import { Simulation } from './sim.js';
 import { setMaxAnisotropy } from './textures.js';
 import { assignDesks } from './layout.js';
 import { createHDView, HD_SCENES } from './hd/view.js';
+import { makePacer } from './pace.js';
 
 // The team lives on the server (set up on the HR page), so load it first.
 // first run: nobody has set up a team yet, so start on the Team page
@@ -93,7 +94,7 @@ function start(config) {
   function createStandardView() {
     // ---------- renderer ----------
     const renderer = new THREE.WebGLRenderer({ antialias: true, powerPreference: 'high-performance' });
-    renderer.setPixelRatio(window.devicePixelRatio); // never below the screen's own resolution
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2)); // sharp on high-DPI screens, without drawing 3x the pixels
     renderer.outputColorSpace = THREE.SRGBColorSpace;
     renderer.toneMapping = THREE.ACESFilmicToneMapping;
     renderer.toneMappingExposure = 1.0;
@@ -197,7 +198,14 @@ function start(config) {
     const clock = new THREE.Clock();
     let firstFrame = true;
     let fpsT = 0, frames = 0, slow = 0;
+    const pacer = makePacer(renderer.domElement, controls);
+    const walking = () => Object.values(crew.bots).some((b) => b.phase === 'walking' || b.phase === 'entering');
+    renderer.shadowMap.autoUpdate = false;              // shadows are redrawn on demand, see below
+    let lastShadow = 0;
     renderer.setAnimationLoop(() => {
+      if (!pacer.due(walking())) return;               // idle office: fewer frames (see pace.js)
+      // shadows only change when something moves: every frame while busy, once a second otherwise
+      if (pacer.active() || performance.now() - lastShadow > 1000) { renderer.shadowMap.needsUpdate = true; lastShadow = performance.now(); }
       const dt = Math.min(clock.getDelta(), 0.05);
       controls.update();
       if (world.cutaway) {
@@ -210,6 +218,8 @@ function start(config) {
       composer.render();
       labels.render(scene, camera);
       // effects go before resolution does
+      // (only judged while running at full speed: the idle pace isn't a slow GPU)
+      if (!pacer.active()) { fpsT = 0; frames = 0; return; }
       fpsT += dt; frames++;
       if (fpsT >= 2) {
         const fps = frames / fpsT;
@@ -222,14 +232,15 @@ function start(config) {
     return {
       kind: 'standard',
       todLabels: world.todLabels,
-      apply: (agents, settings, opts) => crew.apply(agents, settings, opts),
-      reset: () => crew.reset(),
-      tick: () => crew.tick(),
-      setUsage: (u) => world.setUsage(u),
-      setTimeOfDay(tod) { world.setTimeOfDay(tod); renderer.toneMappingExposure = tod === 'night' ? 1.1 : 1.08; },
-      select(id) { for (const b of Object.values(crew.bots)) b.tagEl.classList.toggle('open', b.id === id); },
+      // anything that changes the picture asks for a frame (the office is otherwise a still image)
+      apply: (agents, settings, opts) => { crew.apply(agents, settings, opts); pacer.invalidate(); },
+      reset: () => { crew.reset(); pacer.invalidate(); },
+      tick: () => { crew.tick(); pacer.invalidate(); },
+      setUsage: (u) => { world.setUsage(u); pacer.invalidate(); },
+      setTimeOfDay(tod) { world.setTimeOfDay(tod); renderer.toneMappingExposure = tod === 'night' ? 1.1 : 1.08; pacer.poke(); },
+      select(id) { for (const b of Object.values(crew.bots)) b.tagEl.classList.toggle('open', b.id === id); pacer.invalidate(); },
       setLooks() {},
-      debug: { crew, world, camera, controls, desks },
+      debug: { crew, world, camera, controls, desks, renderer },
     };
   }
 

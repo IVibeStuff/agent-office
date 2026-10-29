@@ -12,6 +12,7 @@ import { OutputPass } from 'three/examples/jsm/postprocessing/OutputPass.js';
 import { makeAgent, lookFor } from './character.js';
 import { Traveller, makeFX, loadMode, saveMode } from './travel.js';
 import { effectiveState } from '../crew.js';
+import { makePacer } from '../pace.js';
 import office from './scenes/office.js';
 import wizard from './scenes/wizard.js';
 import starship from './scenes/starship.js';
@@ -119,6 +120,10 @@ export function createHDView({ host, labelsHost, theme, team, leadId, onSelect, 
     renderer.setSize(w, h); labels.setSize(w, h); composer.setSize(w, h);
     camera.aspect = w / h; camera.updateProjectionMatrix();
     if (!touched) camera.position.copy(controls.target).addScaledVector(baseOffset, Math.max(1, Math.min(1.8, (C.aspect ?? 1.6) / camera.aspect)));
+    // never leave the camera beyond the zoom-out limit: the controls would nudge it back
+    // every frame (and keep the office from ever going still)
+    const dist = camera.position.distanceTo(controls.target);
+    if (dist > controls.maxDistance) controls.maxDistance = dist + 0.5;
   }
   fit();
   const ro = new ResizeObserver(fit); ro.observe(host);
@@ -223,7 +228,15 @@ export function createHDView({ host, labelsHost, theme, team, leadId, onSelect, 
   // ---------- loop ----------
   const clock = new THREE.Clock();
   let fpsT = 0, frames = 0, slow = 0, lite = false;
+  const pacer = makePacer(renderer.domElement, controls);
+  renderer.shadowMap.autoUpdate = false;   // shadows are redrawn on demand, see below
+  let lastShadow = 0;
   renderer.setAnimationLoop(() => {
+    // moving: someone is travelling or about to; ambient: a "needs you" ring is pulsing
+    const moving = Object.values(crew).some((c) => c.tr.busy || c.want !== c.at);
+    if (!pacer.due(moving, Object.values(markers).some((mk) => mk.state))) return;   // idle room: a still picture (see pace.js)
+    // shadows only change when something moves: every frame while busy, once a second otherwise
+    if (pacer.active() || performance.now() - lastShadow > 1000) { renderer.shadowMap.needsUpdate = true; lastShadow = performance.now(); }
     // keep movement in real time even when the browser throttles a background window:
     // big gaps are replayed in small steps (up to 10 s), so agents arrive when they should
     const raw = Math.min(clock.getDelta(), 10), t = clock.elapsedTime;
@@ -239,6 +252,7 @@ export function createHDView({ host, labelsHost, theme, team, leadId, onSelect, 
     composer.render();
     labels.render(scene, camera);
     // frame-rate guard: drop bloom first, then the extras and resolution
+    if (!pacer.active()) { fpsT = 0; frames = 0; return; }   // the idle pace isn't a slow GPU
     fpsT += raw; frames++;
     if (fpsT >= 2) {
       // under ~8 fps the browser is throttling a hidden/background window: not the GPU's fault
@@ -255,13 +269,14 @@ export function createHDView({ host, labelsHost, theme, team, leadId, onSelect, 
     get mode() { return mode; },
     setMode(m) { mode = m; saveMode(theme, m); },
     todLabels: null,
-    apply(agents, settings) { lastAgents = agents; lastSettings = settings; for (const c of Object.values(crew)) decide(c, first); first = false; },
+    apply(agents, settings) { lastAgents = agents; lastSettings = settings; for (const c of Object.values(crew)) decide(c, first); first = false; pacer.invalidate(); },
     reset() { first = true; },
-    tick() { for (const c of Object.values(crew)) decide(c, false); },
-    setUsage(u) { room.setUsage?.(u); },
+    tick() { for (const c of Object.values(crew)) decide(c, false); pacer.invalidate(); },
+    setUsage(u) { room.setUsage?.(u); pacer.invalidate(); },
     setTimeOfDay() {},
     select(id) { for (const c of Object.values(crew)) c.el.classList.toggle('open', c.m.id === id); },
     setLooks(next) {
+      pacer.invalidate();
       looks = next || {};
       for (const c of Object.values(crew)) {
         if (c.tr.busy) continue; // swap them once they've arrived

@@ -317,7 +317,7 @@ export function buildMission({ team, leadId, desks }) {
     const uz = 0.6, uw = 2.6, uh = 1.26, uy = 2.45;
     westDecor.push(B(root, 0.08, uh + 0.14, uw + 0.14, '#2a2b2c', L.LEFT_WALL_X + 0.04, uy - uh / 2 - 0.07, uz, { cast: false }));
     const m = new THREE.Mesh(new THREE.PlaneGeometry(uw, uh), new THREE.MeshBasicMaterial({ map: usageBoard.texture, toneMapped: false, color: '#e0ddd2' }));
-    m.rotation.y = Math.PI / 2; m.position.set(L.LEFT_WALL_X + 0.085, uy, uz); root.add(m); westDecor.push(m);
+    m.rotation.y = Math.PI / 2; m.position.set(L.LEFT_WALL_X + 0.1, uy, uz); root.add(m); westDecor.push(m);
   }
 
   // ---------- glass partition + viewing gallery ----------
